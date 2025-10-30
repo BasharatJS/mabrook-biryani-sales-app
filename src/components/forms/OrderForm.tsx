@@ -38,6 +38,10 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [selectedPaymentMode, setSelectedPaymentMode] = useState<'UPI' | 'Cash' | null>(null);
 
+  // Search and Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+
   const [formData, setFormData] = useState<OrderFormData>({
     biryaniQuantity: 1,
     orderItems: [],
@@ -70,6 +74,13 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
 
   const totalAmount = selectedItems.reduce((sum, item) => sum + item.total, 0);
   const totalItems = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Filter menu items based on search term and category
+  const filteredMenuItems = menuItems.filter((item) => {
+    const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   const updateQuantity = (menuItemId: string, delta: number) => {
     setQuantities(prev => {
@@ -380,6 +391,111 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
       <div className="p-6">
         {currentStep === 'menu' ? (
           <div>
+            {/* Search and Filter Section */}
+            {!loadingMenuItems && menuItems.length > 0 && (
+              <div className="mb-6 space-y-4">
+                {/* Search Bar */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="🔍 Search menu items..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full px-4 py-3 pl-10 border-2 border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-foreground"
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+
+                {/* Category Filter */}
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'all'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    All Items
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('mutton')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'mutton'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🐑 Mutton
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('chicken')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'chicken'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🐔 Chicken
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('egg')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'egg'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🥚 Egg
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('veg')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'veg'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🥔 Veg
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('extras')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'extras'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🍽️ Extras
+                  </button>
+                  <button
+                    onClick={() => setSelectedCategory('beverages')}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      selectedCategory === 'beverages'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'bg-background border border-border hover:border-primary'
+                    }`}
+                  >
+                    🥤 Beverages
+                  </button>
+                </div>
+
+                {/* Results count */}
+                {(searchTerm || selectedCategory !== 'all') && (
+                  <p className="text-sm text-gray-600">
+                    Showing {filteredMenuItems.length} of {menuItems.length} items
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Menu Items Grid */}
             {loadingMenuItems ? (
               <div className="flex items-center justify-center py-12">
@@ -392,9 +508,24 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
                 <p className="text-lg font-medium mb-2">No menu items available</p>
                 <p className="text-sm">Please contact the restaurant to add menu items</p>
               </div>
+            ) : filteredMenuItems.length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <div className="text-4xl mb-4">🔍</div>
+                <p className="text-lg font-medium mb-2">No items found</p>
+                <p className="text-sm">Try adjusting your search or filter</p>
+                <button
+                  onClick={() => {
+                    setSearchTerm('');
+                    setSelectedCategory('all');
+                  }}
+                  className="mt-4 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
+                >
+                  Clear filters
+                </button>
+              </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                {menuItems.map((item) => {
+                {filteredMenuItems.map((item) => {
                   const quantity = quantities[item.id!] || 0;
                 return (
                   <div key={item.id} className="bg-white border-2 border-border rounded-xl p-4 hover:border-primary transition-colors">
