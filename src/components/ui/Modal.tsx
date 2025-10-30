@@ -54,7 +54,9 @@ export default function Modal({ isOpen, onClose, children, size = 'md' }: ModalP
         onClick={onClose}
       />
       
-      <div className={`relative bg-background rounded-lg shadow-xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] overflow-y-auto`}>
+      <div
+        className={`relative bg-background rounded-lg shadow-xl w-full ${sizeClasses[size]} mx-4 max-h-[90vh] overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]`}
+      >
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-secondary hover:text-foreground transition-colors z-10"
@@ -63,7 +65,7 @@ export default function Modal({ isOpen, onClose, children, size = 'md' }: ModalP
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
-        
+
         {children}
       </div>
     </div>
