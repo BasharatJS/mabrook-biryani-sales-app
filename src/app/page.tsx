@@ -98,7 +98,7 @@ export default function Home() {
             <span className="text-2xl">🍛</span>
           </div>
           <h1 className="text-4xl font-bold text-primary">
-            ARMANIA BIRYANI HOUSE
+            MABROOK BIRYANI RESTAURANT
           </h1>
         </div>
         <p className="text-lg text-secondary">
