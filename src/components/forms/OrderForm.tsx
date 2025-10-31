@@ -576,7 +576,7 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      {isCustomerFlow ? 'Your Name *' : 'Customer Name *'}
+                      {isCustomerFlow ? 'Your Name *' : 'Customer Name'}
                     </label>
                     <input
                       type="text"
@@ -588,7 +588,7 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-foreground mb-1">
-                      {isCustomerFlow ? 'Your Phone Number *' : 'Phone Number *'}
+                      {isCustomerFlow ? 'Your Phone Number *' : 'Phone Number'}
                     </label>
                     <input
                       type="tel"

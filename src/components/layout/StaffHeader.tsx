@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
-import { useAuth } from '@/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function StaffHeader() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuth()
 
   return (
     <>
@@ -15,8 +15,12 @@ export default function StaffHeader() {
                 <span className="text-xl">🍛</span>
               </div>
               <div>
-                <h1 className="text-xl font-bold">ARMANIA BIRYANI HOUSE</h1>
-                <p className="text-sm text-primary-foreground/80">Staff Panel</p>
+                <h1 className="text-xl font-bold">
+                  MABROOK BIRYANI RESTAURANT
+                </h1>
+                <p className="text-sm text-primary-foreground/80">
+                  Staff Panel
+                </p>
               </div>
             </div>
 
@@ -24,9 +28,11 @@ export default function StaffHeader() {
               <div className="flex items-center space-x-3">
                 <div className="text-right">
                   <p className="text-sm font-medium">{user?.name}</p>
-                  <p className="text-xs text-primary-foreground/70 capitalize">{user?.role}</p>
+                  <p className="text-xs text-primary-foreground/70 capitalize">
+                    {user?.role}
+                  </p>
                 </div>
-                
+
                 <button
                   onClick={logout}
                   className="bg-danger text-danger-foreground px-3 py-1.5 rounded text-sm font-medium hover:bg-red-700 transition-colors"
@@ -39,5 +45,5 @@ export default function StaffHeader() {
         </div>
       </header>
     </>
-  );
+  )
 }

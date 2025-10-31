@@ -366,19 +366,30 @@ export default function Home() {
 
       {/* Footer */}
       <div className="text-center py-8 mt-8">
-        <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 mx-4 lg:mx-auto max-w-2xl border border-border">
-          <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-6 text-sm text-secondary">
+        <div className="bg-card/50 backdrop-blur-sm rounded-lg p-4 mx-4 lg:mx-auto max-w-3xl border border-border">
+          <div className="flex flex-col md:flex-row items-center justify-center space-y-3 md:space-y-0 md:space-x-6 text-sm text-secondary">
             <div className="flex items-center">
               <span className="text-lg mr-2">⏰</span>
-              <span>Open 10:00 AM - 12:00 PM</span>
+              <span>Open 12 Noon - 11:00 PM</span>
+            </div>
+            <div className="flex flex-col items-center space-y-1">
+              <div className="flex items-center">
+                <span className="text-lg mr-2">📞</span>
+                <span className="font-medium text-primary">Call for bulk orders</span>
+              </div>
+              <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3 text-xs">
+                <a href="tel:+917003654945" className="hover:text-primary transition-colors font-medium">
+                  +91 7003654945
+                </a>
+                <span className="hidden sm:inline">|</span>
+                <a href="tel:+918240717393" className="hover:text-primary transition-colors font-medium">
+                  +91 8240717393
+                </a>
+              </div>
             </div>
             <div className="flex items-center">
-              <span className="text-lg mr-2">📞</span>
-              <span>Call for bulk orders</span>
-            </div>
-            <div className="flex items-center">
-              <span className="text-lg mr-2">🚚</span>
-              <span>Free delivery above ₹500</span>
+              <span className="text-lg mr-2">🍛</span>
+              <span>Authentic Kolkata Taste</span>
             </div>
           </div>
         </div>
