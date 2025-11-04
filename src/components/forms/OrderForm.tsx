@@ -54,6 +54,9 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
     customerPhone: ''
   });
 
+  // Discount state
+  const [discount, setDiscount] = useState<number>(0);
+
   const [errors, setErrors] = useState<{[key: string]: string}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -72,8 +75,13 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
     })
     .filter(item => item !== null) as OrderItem[];
 
-  const totalAmount = selectedItems.reduce((sum, item) => sum + item.total, 0);
+  const subtotal = selectedItems.reduce((sum, item) => sum + item.total, 0);
   const totalItems = selectedItems.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Calculate discount (only for manager/staff, not for customers)
+  const effectiveDiscount = isCustomerFlow ? 0 : discount;
+  const discountAmount = (subtotal * effectiveDiscount) / 100;
+  const totalAmount = subtotal - discountAmount;
 
   // Filter menu items based on search term and category
   const filteredMenuItems = menuItems.filter((item) => {
@@ -166,6 +174,8 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
         orderItems: selectedItems,
         biryaniQuantity: totalItems,
         paymentMode: paymentMode,
+        // Only include discount for manager/staff orders, not customer orders
+        ...(!isCustomerFlow && discount > 0 && { discount }),
         // Add customer details for customer flow
         ...(isCustomerFlow && {
           customerName: customerDetails.customerName,
@@ -195,6 +205,8 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
         id: createdOrder.id || Date.now().toString(),
         biryaniQuantity: totalItems,
         totalAmount: totalAmount,
+        // Only include discount for manager/staff orders, not customer orders
+        ...(!isCustomerFlow && discount > 0 && { discount }),
         orderItems: selectedItems,
         orderDate: Timestamp.now(),
         status: 'pending' as const,
@@ -228,7 +240,10 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
   const sendWhatsAppToOwner = (order: any) => {
     const ownerPhone = '7022340149'; // Biryani owner's WhatsApp number
     const customerName = order.customerName || 'Customer';
-    
+
+    const subtotalCalc = order.orderItems.reduce((sum: number, item: any) => sum + item.total, 0);
+    const discountAmt = order.discount ? (subtotalCalc * order.discount) / 100 : 0;
+
     const message = `🍛 NEW ORDER RECEIVED!
 
 Customer: ${customerName}
@@ -238,6 +253,7 @@ Order ID: #${order.id?.slice(-6)}
 Items:
 ${order.orderItems.map((item: any) => `• ${item.quantity}x ${item.name} - ₹${item.total}`).join('\n')}
 
+Subtotal: ₹${subtotalCalc}${order.discount ? `\nDiscount (${order.discount}%): - ₹${discountAmt.toFixed(2)}` : ''}
 Total Amount: ₹${order.totalAmount}
 Payment: ${order.paymentMode}
 
@@ -257,10 +273,11 @@ Please prepare this delicious biryani order!
     });
     setQuantities({});
     setCustomerDetails({ customerName: '', customerPhone: '' });
+    setDiscount(0);
     setCurrentStep('menu');
     setGeneratedOrder(null);
     setSelectedPaymentMode(null);
-    
+
     if (onSuccess) {
       onSuccess();
     }
@@ -268,11 +285,15 @@ Please prepare this delicious biryani order!
 
   const handleWhatsAppShare = () => {
     if (generatedOrder && customerDetails.customerPhone) {
+      const subtotalCalc = generatedOrder.orderItems.reduce((sum: number, item: any) => sum + item.total, 0);
+      const discountAmt = generatedOrder.discount ? (subtotalCalc * generatedOrder.discount) / 100 : 0;
+
       const message = `Hello! Your order from ARMANIA BIRYANI HOUSE is confirmed.
-      
+
 Order Details:
 ${generatedOrder.orderItems.map((item: any) => `• ${item.quantity}x ${item.name} - ₹${item.total}`).join('\n')}
 
+Subtotal: ₹${subtotalCalc}${generatedOrder.discount ? `\nDiscount (${generatedOrder.discount}%): - ₹${discountAmt.toFixed(2)}` : ''}
 Total Amount: ₹${generatedOrder.totalAmount}
 Order ID: #${generatedOrder.id?.slice(-6)}
 
@@ -327,6 +348,12 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
               <div className="flex justify-between items-center mb-2">
                 <span className="font-medium">Phone:</span>
                 <span>{customerDetails.customerPhone}</span>
+              </div>
+            )}
+            {generatedOrder.discount && generatedOrder.discount > 0 && (
+              <div className="flex justify-between items-center mb-2 text-green-600">
+                <span className="font-medium">Discount:</span>
+                <span>{generatedOrder.discount}%</span>
               </div>
             )}
             <div className="flex justify-between items-center">
@@ -620,8 +647,43 @@ We will prepare your delicious biryani and contact you shortly. Thank you for ch
                     </div>
                   ))}
                 </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between font-bold text-lg text-primary">
+                <div className="border-t pt-3 mt-3">
+                  {!isCustomerFlow && (
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Subtotal:</span>
+                      <span className="font-medium">₹{subtotal.toLocaleString()}</span>
+                    </div>
+                  )}
+
+                  {/* Discount Input - Only for Manager/Staff Dashboard */}
+                  {!isCustomerFlow && (
+                    <div className="mb-3">
+                      <label className="block text-sm font-medium text-foreground mb-2">
+                        💰 Discount (%)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={discount}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0;
+                          setDiscount(Math.min(100, Math.max(0, value)));
+                        }}
+                        className="w-full px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                        placeholder="Enter discount percentage (0-100)"
+                      />
+                    </div>
+                  )}
+
+                  {!isCustomerFlow && discount > 0 && (
+                    <div className="flex justify-between text-sm text-green-600 mb-2">
+                      <span>Discount ({discount}%):</span>
+                      <span className="font-medium">- ₹{discountAmount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  <div className={`flex justify-between font-bold text-lg text-primary ${!isCustomerFlow ? 'pt-2 border-t' : ''}`}>
                     <span>Total Amount:</span>
                     <span>₹{totalAmount.toLocaleString()}</span>
                   </div>

@@ -5,6 +5,8 @@ import { Order } from '@/lib/types';
 import { OrderService, OrderStats } from '@/lib/firestore';
 import { QueryDocumentSnapshot } from 'firebase/firestore';
 import OrderEditModal from './OrderEditModal';
+import DeleteConfirmationModal from '@/components/modals/DeleteConfirmationModal';
+import SuccessToast from '@/components/ui/SuccessToast';
 
 
 interface OrdersListProps {
@@ -31,6 +33,12 @@ export default function OrdersList({ refreshTrigger }: OrdersListProps) {
   // Edit and Delete state
   const [editingOrder, setEditingOrder] = useState<Order | null>(null);
   const [deletingOrderId, setDeletingOrderId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
+
+  // Success toast state
+  const [showSuccessToast, setShowSuccessToast] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Pagination state for display
   const [currentPage, setCurrentPage] = useState(1);
@@ -518,36 +526,54 @@ export default function OrdersList({ refreshTrigger }: OrdersListProps) {
       await fetchOrders(filters.dateRange, filters.customFromDate, filters.customToDate, false);
       await fetchStats(filters.dateRange, filters.customFromDate, filters.customToDate);
 
-      alert('Order updated successfully!');
+      // Show success toast
+      setSuccessMessage('Order updated successfully!');
+      setShowSuccessToast(true);
     } catch (error) {
       console.error('Error updating order:', error);
       throw error;
     }
   };
 
-  // Handle Delete Order
-  const handleDeleteOrder = async (orderId: string) => {
-    const confirmed = confirm(
-      'Are you sure you want to delete this order? This action cannot be undone.'
-    );
+  // Handle Delete Order - Show modal
+  const handleDeleteOrder = (orderId: string) => {
+    setOrderToDelete(orderId);
+    setShowDeleteModal(true);
+  };
 
-    if (!confirmed) return;
+  // Confirm Delete Order
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    const orderIdToDelete = orderToDelete;
+
+    // Close modal and reset state IMMEDIATELY
+    setShowDeleteModal(false);
+    setOrderToDelete(null);
 
     try {
-      setDeletingOrderId(orderId);
-      await OrderService.deleteOrder(orderId);
+      setDeletingOrderId(orderIdToDelete);
+      await OrderService.deleteOrder(orderIdToDelete);
 
       // Refresh orders list
       await fetchOrders(filters.dateRange, filters.customFromDate, filters.customToDate, false);
       await fetchStats(filters.dateRange, filters.customFromDate, filters.customToDate);
 
-      alert('Order deleted successfully!');
+      // Show success toast
+      setSuccessMessage('Order deleted successfully!');
+      setShowSuccessToast(true);
     } catch (error) {
       console.error('Error deleting order:', error);
       alert('Failed to delete order. Please try again.');
     } finally {
       setDeletingOrderId(null);
     }
+  };
+
+  // Cancel Delete Order
+  const cancelDeleteOrder = () => {
+    setShowDeleteModal(false);
+    setOrderToDelete(null);
   };
 
   if (loading) {
@@ -1244,6 +1270,26 @@ export default function OrdersList({ refreshTrigger }: OrdersListProps) {
           onSave={handleSaveOrder}
         />
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={showDeleteModal}
+        onClose={cancelDeleteOrder}
+        onConfirm={confirmDeleteOrder}
+        title="Delete Order"
+        message="Are you sure you want to delete this order? This action cannot be undone."
+        confirmText="Delete Order"
+        cancelText="Cancel"
+        isDeleting={deletingOrderId === orderToDelete}
+      />
+
+      {/* Success Toast */}
+      <SuccessToast
+        isOpen={showSuccessToast}
+        message={successMessage}
+        onClose={() => setShowSuccessToast(false)}
+        duration={3000}
+      />
     </div>
   );
 }

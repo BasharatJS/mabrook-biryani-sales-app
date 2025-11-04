@@ -109,3 +109,17 @@ body {
 .delay-225 {
   animation-delay: 0.225s;
 }
+
+.delay-300 {
+  animation-delay: 0.3s;
+}
+
+/* Progress bar animation */
+@keyframes progressBar {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

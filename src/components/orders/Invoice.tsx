@@ -40,8 +40,17 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
   const businessAddress = settings.businessAddress;
   const currency = settings.currency;
   const taxRate = settings.taxRate;
-  
-  const subtotal = order.totalAmount;
+
+  // Calculate subtotal from order items
+  const itemsSubtotal = order.orderItems && order.orderItems.length > 0
+    ? order.orderItems.reduce((sum, item) => sum + item.total, 0)
+    : order.totalAmount;
+
+  // Calculate discount
+  const discountPercent = order.discount || 0;
+  const discountAmount = discountPercent > 0 ? (itemsSubtotal * discountPercent) / 100 : 0;
+  const subtotal = itemsSubtotal - discountAmount;
+
   const taxAmount = (subtotal * taxRate) / 100;
   const finalTotal = subtotal + taxAmount;
 
@@ -222,8 +231,14 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
             <div className="border border-gray-200 rounded">
               <div className="flex justify-between items-center py-2 px-3 border-b border-gray-200 text-sm">
                 <span className="text-gray-600">Subtotal:</span>
-                <span className="text-gray-800 font-medium">{currency}{subtotal.toLocaleString()}</span>
+                <span className="text-gray-800 font-medium">{currency}{itemsSubtotal.toLocaleString()}</span>
               </div>
+              {discountPercent > 0 && (
+                <div className="flex justify-between items-center py-2 px-3 border-b border-gray-200 text-sm">
+                  <span className="text-green-600">Discount ({discountPercent}%):</span>
+                  <span className="text-green-600 font-medium">- {currency}{discountAmount.toFixed(2)}</span>
+                </div>
+              )}
               {taxRate > 0 && (
                 <div className="flex justify-between items-center py-2 px-3 border-b border-gray-200 text-sm">
                   <span className="text-gray-600">Tax ({taxRate}%):</span>
@@ -232,7 +247,7 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
               )}
               <div className="flex justify-between items-center py-2 px-3 bg-gray-100 font-bold text-base">
                 <span className="text-gray-800">Total:</span>
-                <span className="text-gray-800">{currency}{finalTotal.toLocaleString()}</span>
+                <span className="text-gray-800">{currency}{finalTotal.toFixed(2)}</span>
               </div>
             </div>
           </div>

@@ -24,6 +24,7 @@ export default function OrderEditModal({ order, onClose, onSave }: OrderEditModa
   const [customerPhone, setCustomerPhone] = useState((order as any).customerPhone || '');
   const [paymentMode, setPaymentMode] = useState(order.paymentMode || 'Cash');
   const [notes, setNotes] = useState(order.notes || '');
+  const [discount, setDiscount] = useState<number>(order.discount || 0);
   const [loading, setLoading] = useState(false);
   const [loadingMenu, setLoadingMenu] = useState(true);
 
@@ -83,9 +84,11 @@ export default function OrderEditModal({ order, onClose, onSave }: OrderEditModa
   };
 
   const calculateTotals = () => {
-    const totalAmount = orderItems.reduce((sum, item) => sum + item.total, 0);
+    const subtotal = orderItems.reduce((sum, item) => sum + item.total, 0);
     const biryaniQuantity = orderItems.reduce((sum, item) => sum + item.quantity, 0);
-    return { totalAmount, biryaniQuantity };
+    const discountAmount = (subtotal * discount) / 100;
+    const totalAmount = subtotal - discountAmount;
+    return { subtotal, totalAmount, biryaniQuantity, discountAmount };
   };
 
   const handleSave = async () => {
@@ -102,6 +105,7 @@ export default function OrderEditModal({ order, onClose, onSave }: OrderEditModa
         orderItems,
         totalAmount,
         biryaniQuantity,
+        discount: discount > 0 ? discount : undefined,
         paymentMode: paymentMode as 'UPI' | 'Cash',
         notes,
         ...(customerName && { customerName }),
@@ -118,7 +122,7 @@ export default function OrderEditModal({ order, onClose, onSave }: OrderEditModa
     }
   };
 
-  const { totalAmount, biryaniQuantity } = calculateTotals();
+  const { subtotal, totalAmount, biryaniQuantity, discountAmount } = calculateTotals();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
@@ -307,15 +311,44 @@ export default function OrderEditModal({ order, onClose, onSave }: OrderEditModa
             </div>
           </div>
 
+          {/* Discount Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              💰 Discount (%)
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="100"
+              value={discount}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value) || 0;
+                setDiscount(Math.min(100, Math.max(0, value)));
+              }}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="Enter discount percentage (0-100)"
+            />
+          </div>
+
           {/* Order Summary */}
           <div className="bg-gradient-to-r from-primary to-orange-600 rounded-lg p-4 text-white">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium">Total Items:</span>
               <span className="text-lg font-bold">{biryaniQuantity}</span>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium">Subtotal:</span>
+              <span className="text-lg font-bold">₹{subtotal}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex items-center justify-between mb-2 text-green-200">
+                <span className="text-sm font-medium">Discount ({discount}%):</span>
+                <span className="text-lg font-bold">- ₹{discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <div className="flex items-center justify-between pt-2 border-t border-white/30">
               <span className="text-sm font-medium">Total Amount:</span>
-              <span className="text-2xl font-bold">₹{totalAmount}</span>
+              <span className="text-2xl font-bold">₹{totalAmount.toFixed(2)}</span>
             </div>
           </div>
         </div>

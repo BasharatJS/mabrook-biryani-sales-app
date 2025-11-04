@@ -4,6 +4,7 @@ export interface Order {
   id?: string;
   biryaniQuantity: number;
   totalAmount: number;
+  discount?: number; // Discount percentage (0-100)
   status: 'pending' | 'preparing' | 'ready' | 'completed' | 'cancelled';
   orderDate: Timestamp;
   notes?: string;

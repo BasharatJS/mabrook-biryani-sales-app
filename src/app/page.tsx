@@ -98,7 +98,7 @@ export default function Home() {
             <span className="text-2xl">🍛</span>
           </div>
           <h1 className="text-4xl font-bold text-primary">
-            MABROOK BIRYANI RESTAURANT
+            MABROOK RESTAURANT BIRYANI/ROLLS
           </h1>
         </div>
         <p className="text-lg text-secondary">
@@ -375,14 +375,22 @@ export default function Home() {
             <div className="flex flex-col items-center space-y-1">
               <div className="flex items-center">
                 <span className="text-lg mr-2">📞</span>
-                <span className="font-medium text-primary">Call for bulk orders</span>
+                <span className="font-medium text-primary">
+                  Call for bulk orders
+                </span>
               </div>
               <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-3 text-xs">
-                <a href="tel:+917003654945" className="hover:text-primary transition-colors font-medium">
+                <a
+                  href="tel:+917003654945"
+                  className="hover:text-primary transition-colors font-medium"
+                >
                   +91 7003654945
                 </a>
                 <span className="hidden sm:inline">|</span>
-                <a href="tel:+918240717393" className="hover:text-primary transition-colors font-medium">
+                <a
+                  href="tel:+918240717393"
+                  className="hover:text-primary transition-colors font-medium"
+                >
                   +91 8240717393
                 </a>
               </div>
