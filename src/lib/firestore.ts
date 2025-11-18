@@ -90,10 +90,10 @@ export const collections = {
 
 export class OrderService {
   // Create new order for manager dashboard
-  static async createOrder(orderData: OrderFormData): Promise<string> {
+  static async createOrder(orderData: OrderFormData): Promise<any> {
     const totalAmount = orderData.orderItems.reduce((sum, item) => sum + item.total, 0);
-    
-    const order: Omit<Order, 'id'> = {
+
+    const order: any = {
       biryaniQuantity: orderData.biryaniQuantity,
       totalAmount,
       orderItems: orderData.orderItems,
@@ -102,16 +102,22 @@ export class OrderService {
       createdAt: Timestamp.now(),
       updatedAt: Timestamp.now(),
       notes: orderData.notes,
+      paymentMode: orderData.paymentMode,
+      ...(orderData.discount && orderData.discount > 0 && { discount: orderData.discount }),
     };
 
     const docRef = await addDoc(collection(db, collections.orders), order);
-    return docRef.id;
+
+    return {
+      id: docRef.id,
+      ...order
+    };
   }
 
   // Create order from customer portal (public orders)
   static async createCustomerOrder(orderData: any): Promise<any> {
     const totalAmount = orderData.orderItems.reduce((sum: number, item: any) => sum + item.total, 0);
-    
+
     const order: any = {
       biryaniQuantity: orderData.biryaniQuantity,
       totalAmount,
@@ -125,10 +131,11 @@ export class OrderService {
       orderType: 'online', // Mark as online order
       ...(orderData.customerName && { customerName: orderData.customerName }),
       ...(orderData.customerPhone && { customerPhone: orderData.customerPhone }),
+      ...(orderData.discount && orderData.discount > 0 && { discount: orderData.discount }),
     };
 
     const docRef = await addDoc(collection(db, collections.orders), order);
-    
+
     return {
       id: docRef.id,
       ...order
@@ -138,7 +145,7 @@ export class OrderService {
   // Create order from staff dashboard with customer details
   static async createStaffOrder(orderData: any): Promise<any> {
     const totalAmount = orderData.orderItems.reduce((sum: number, item: any) => sum + item.total, 0);
-    
+
     const order: any = {
       biryaniQuantity: orderData.biryaniQuantity,
       totalAmount,
@@ -152,10 +159,11 @@ export class OrderService {
       ...(orderData.customerName && { customerName: orderData.customerName }),
       ...(orderData.customerPhone && { customerPhone: orderData.customerPhone }),
       ...(orderData.orderType && { orderType: orderData.orderType }),
+      ...(orderData.discount && orderData.discount > 0 && { discount: orderData.discount }),
     };
 
     const docRef = await addDoc(collection(db, collections.orders), order);
-    
+
     return {
       id: docRef.id,
       ...order

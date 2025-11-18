@@ -76,6 +76,8 @@ export interface OrderFormData {
   biryaniQuantity: number;
   orderItems: OrderItem[];
   notes?: string;
+  paymentMode?: 'UPI' | 'Cash';
+  discount?: number;
 }
 
 export interface ExpenseFormData {
