@@ -17,8 +17,8 @@ export default function PostInvoiceActions({ order, onComplete }: PostInvoiceAct
       ? order.orderItems.map(item => `${item.name} x ${item.quantity} = Rs.${item.total}`).join('\n')
       : `Mixed Items x ${order.biryaniQuantity} = Rs.${order.totalAmount}`;
 
-    const message = `ARMANIA BIRYANI HOUSE
-MAYA BAZAR, DURGAPUR, KOLKATA
+    const message = `MABROOK RESTAURANT
+1, Feeder Rd, Manasbag, Rathtala, Crossing, Kolkata, West Bengal 700066
 
 ORDER SUMMARY
 Invoice: ${order.id || 'AUTO'}
@@ -30,7 +30,7 @@ ${items}
 TOTAL AMOUNT: Rs.${order.totalAmount.toLocaleString()}
 PAYMENT MODE: ${order.paymentMode || 'Cash'}
 
-${order.notes ? `Notes: ${order.notes}\n` : ''}Thank you for choosing ARMANIA BIRYANI HOUSE!
+${order.notes ? `Notes: ${order.notes}\n` : ''}Thank you for choosing MABROOK RESTAURANT!
 We appreciate your business.`;
 
     return encodeURIComponent(message);
@@ -104,8 +104,9 @@ We appreciate your business.`;
       : `Mixed Items\n  ${order.biryaniQuantity} x Rs.${order.totalAmount} = Rs.${order.totalAmount}\n`;
 
     return `
-ARMANIA BIRYANI HOUSE
-MAYA BAZAR, DURGAPUR, KOLKATA
+MABROOK RESTAURANT
+1, Feeder Rd, Manasbag, Rathtala,
+Crossing, Kolkata, West Bengal 700066
 ================================
 Invoice: ${order.id || 'AUTO'}
 Date: ${order.orderDate ? new Date(order.orderDate.toDate()).toLocaleString() : new Date().toLocaleString()}

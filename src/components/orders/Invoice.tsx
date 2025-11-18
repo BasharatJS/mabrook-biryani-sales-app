@@ -14,7 +14,7 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
     businessName: 'MABROOK RESTAURANT',
     businessPhone: '+918248717393/7003654945',
     businessAddress:
-      '1, Feeder Rd, Nanajbag, Rathtala, Crossing, Kolkata, West Bengal 700066',
+      '1, Feeder Rd, Manasbag, Rathtala, Crossing, Kolkata, West Bengal 700066',
     currency: '₹',
     taxRate: 0,
   }
@@ -34,6 +34,26 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
       hour: '2-digit',
       minute: '2-digit',
     })
+  }
+
+  const formatReceiptDate = (timestamp: any) => {
+    const date = timestamp && timestamp.toDate ? timestamp.toDate() : new Date()
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = date.toLocaleString('en-IN', { month: 'short' })
+    const year = String(date.getFullYear()).slice(-2)
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${day} ${month} ${year} ${hours}:${minutes}`
+  }
+
+  const formatKitchenDate = (timestamp: any) => {
+    const date = timestamp && timestamp.toDate ? timestamp.toDate() : new Date()
+    const day = String(date.getDate()).padStart(2, '0')
+    const month = date.toLocaleString('en-IN', { month: 'short' })
+    const year = date.getFullYear()
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
+    return `${day} ${month} ${year} ${hours}:${minutes}`
   }
 
   const businessName = settings.businessName
@@ -139,9 +159,7 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
               ? order.id.substring(0, 8).toUpperCase()
               : 'AM-' + new Date().getTime().toString().slice(-4)}
           </span>
-          <span>
-            {formatDate(order.orderDate)} {formatTime(order.orderDate)}
-          </span>
+          <span>{formatReceiptDate(order.orderDate)}</span>
         </div>
 
         {/* Dotted Line */}
@@ -282,8 +300,49 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
         <div className="dotted-line my-3"></div>
 
         {/* Footer */}
-        <div className="text-center text-xs">
-          <p>Powered by EVONNEXIS PVT LTD</p>
+        <div className="text-center text-xs mb-8">
+          <p>Powered by Zobaze</p>
+        </div>
+
+        {/* Kitchen Copy Section */}
+        <div className="mt-8 pt-6">
+          {/* Order Number */}
+          <div className="text-base font-bold mb-2">
+            {order.id
+              ? order.id.substring(0, 8).toUpperCase()
+              : 'AH-' + new Date().getTime().toString().slice(-4)}
+          </div>
+
+          {/* Dotted Line */}
+          <div className="dotted-line my-2"></div>
+
+          {/* By Restaurant Name */}
+          <div className="text-xs mb-1">
+            <span>By: {businessName}</span>
+          </div>
+
+          {/* Date and Time */}
+          <div className="text-xs mb-2">{formatKitchenDate(order.orderDate)}</div>
+
+          {/* Dotted Line */}
+          <div className="dotted-line my-2"></div>
+
+          {/* Kitchen Items List - Simple list with quantities */}
+          <div className="mb-2">
+            {order.orderItems && order.orderItems.length > 0 ? (
+              order.orderItems.map((item: any, index: number) => (
+                <div key={index} className="flex justify-between text-xs mb-1 uppercase">
+                  <span>{item.name}</span>
+                  <span>{item.quantity}</span>
+                </div>
+              ))
+            ) : (
+              <div className="flex justify-between text-xs mb-1 uppercase">
+                <span>Mixed Items</span>
+                <span>{order.biryaniQuantity}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Post-Invoice Actions */}

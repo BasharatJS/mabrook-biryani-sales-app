@@ -223,9 +223,8 @@ export default function OrderForm({ onSuccess, onCancel, title, isCustomerFlow =
         // Send WhatsApp to biryani owner
         sendWhatsAppToOwner(orderForInvoice);
         setCurrentStep('post-order');
-      } else if (isStaffFlow) {
-        setCurrentStep('post-order');
       } else {
+        // For staff and manager flows, show invoice directly
         setCurrentStep('invoice');
       }
       
