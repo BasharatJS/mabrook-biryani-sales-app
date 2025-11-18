@@ -301,7 +301,7 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
 
         {/* Footer */}
         <div className="text-center text-xs mb-8">
-          <p>Powered by Zobaze</p>
+          <p>Powered by Evonnexis Pvt Ltd.</p>
         </div>
 
         {/* Kitchen Copy Section */}
@@ -322,7 +322,9 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
           </div>
 
           {/* Date and Time */}
-          <div className="text-xs mb-2">{formatKitchenDate(order.orderDate)}</div>
+          <div className="text-xs mb-2">
+            {formatKitchenDate(order.orderDate)}
+          </div>
 
           {/* Dotted Line */}
           <div className="dotted-line my-2"></div>
@@ -331,7 +333,10 @@ export default function Invoice({ order, onPrint }: InvoiceProps) {
           <div className="mb-2">
             {order.orderItems && order.orderItems.length > 0 ? (
               order.orderItems.map((item: any, index: number) => (
-                <div key={index} className="flex justify-between text-xs mb-1 uppercase">
+                <div
+                  key={index}
+                  className="flex justify-between text-xs mb-1 uppercase"
+                >
                   <span>{item.name}</span>
                   <span>{item.quantity}</span>
                 </div>
